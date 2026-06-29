@@ -1,264 +1,155 @@
-# 📦 Project Setup
+IS601 – Modular Python Calculator
+1. Introduction
+This project implements a modular, extensible command‑line calculator developed in Python.
+The application demonstrates the integration of multiple software engineering design patterns, robust input validation, persistent data storage, and automated testing practices.
+It is designed to serve as a maintainable and scalable example of professional software architecture within an academic context.
 
----
+2. System Overview
+The calculator supports a variety of arithmetic operations, maintains a persistent calculation history, and provides undo/redo functionality.
+The system architecture incorporates the following design patterns:
 
-# 🧩 1. Install Homebrew (Mac Only)
+Strategy Pattern: Each arithmetic operation is encapsulated within its own class, enabling interchangeable execution strategies.
+Factory Pattern: A centralized factory constructs operation objects based on user‑provided identifiers.
+Observer Pattern: Observers monitor calculation events, enabling automatic logging and optional auto‑saving.
+Memento Pattern: The calculator preserves historical states to support undo and redo operations.
 
-> Skip this step if you're on Windows.
+The application uses Python’s Decimal type to ensure numerical precision and employs pandas for structured history storage.
 
-Homebrew is a package manager for macOS.  
-You’ll use it to easily install Git, Python, Docker, etc.
+3. Installation Instructions
+3.1 Clone the Repository
+git clone <your-repository-url>
+cd <project-directory>
 
-**Install Homebrew:**
-
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-**Verify Homebrew:**
-
-```bash
-brew --version
-```
-
-If you see a version number, you're good to go.
-
----
-
-# 🧩 2. Install and Configure Git
-
-## Install Git
-
-- **MacOS (using Homebrew)**
-
-```bash
-brew install git
-```
-
-- **Windows**
-
-Download and install [Git for Windows](https://git-scm.com/download/win).  
-Accept the default options during installation.
-
-**Verify Git:**
-
-```bash
-git --version
-```
-
----
-
-## Configure Git Globals
-
-Set your name and email so Git tracks your commits properly:
-
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "your_email@example.com"
-```
-
-Confirm the settings:
-
-```bash
-git config --list
-```
-
----
-
-## Generate SSH Keys and Connect to GitHub
-
-> Only do this once per machine.
-
-1. Generate a new SSH key:
-
-```bash
-ssh-keygen -t ed25519 -C "your_email@example.com"
-```
-
-(Press Enter at all prompts.)
-
-2. Start the SSH agent:
-
-```bash
-eval "$(ssh-agent -s)"
-```
-
-3. Add the SSH private key to the agent:
-
-```bash
-ssh-add ~/.ssh/id_ed25519
-```
-
-4. Copy your SSH public key:
-
-- **Mac/Linux:**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | pbcopy
-```
-
-- **Windows (Git Bash):**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | clip
-```
-
-5. Add the key to your GitHub account:
-   - Go to [GitHub SSH Settings](https://github.com/settings/keys)
-   - Click **New SSH Key**, paste the key, save.
-
-6. Test the connection:
-
-```bash
-ssh -T git@github.com
-```
-
-You should see a success message.
-
----
-
-# 🧩 3. Clone the Repository
-
-Now you can safely clone the course project:
-
-```bash
-git clone <repository-url>
-cd <repository-directory>
-```
-
----
-
-# 🛠️ 4. Install Python 3.10+
-
-## Install Python
-
-- **MacOS (Homebrew)**
-
-```bash
-brew install python
-```
-
-- **Windows**
-
-Download and install [Python for Windows](https://www.python.org/downloads/).  
-✅ Make sure you **check the box** `Add Python to PATH` during setup.
-
-**Verify Python:**
-
-```bash
-python3 --version
-```
-or
-```bash
-python --version
-```
-
----
-
-## Create and Activate a Virtual Environment
-
-(Optional but recommended)
-
-```bash
+3.2 Create and Activate a Virtual Environment
 python3 -m venv venv
-source venv/bin/activate   # Mac/Linux
-venv\Scripts\activate.bat  # Windows
-```
+source venv/bin/activate (macOS/Linux)
+venv\Scripts\activate (Windows)
 
-### Install Required Packages
-
-```bash
+3.3 Install Dependencies
 pip install -r requirements.txt
-```
 
----
+5. Usage Guide
+5.1 Launching the Calculator
+Execute the REPL interface using:
+python -m app.calculator_repl
 
-# 🐳 5. (Optional) Docker Setup
+5.2 Supported Commands
+add — Add two numbers
+subtract — Subtract the second operand from the first
+multiply — Multiply two numbers
+divide — Divide the first operand by the second
+power — Compute a raised to the power of b
+root — Compute the b‑th root of a
+modulus — Compute a modulo b
+integer_division — Perform floor division
+percentage — Compute (a × b) / 100
+absolute_difference — Compute |a − b|
+history — Display calculation history
+clear — Clear all stored history
+undo — Revert the most recent calculation
+redo — Reapply the most recently undone calculation
+save — Save history to persistent storage
+load — Load history from persistent storage
+exit — Terminate the application
 
-> Skip if Docker isn't used in this module.
+5.4 Viewing Calculator History
+The calculator stores every completed operation in a persistent history log.
+You can view this history at any time by entering the history command.
 
-## Install Docker
+Example:
 
-- [Install Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/)
-- [Install Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
+Enter command: history
+1: 5 + 3 = 8
+2: 10 / 2 = 5
+3: 7 * 4 = 28
 
-## Build Docker Image
+If no history exists, the system displays:
+No history available.
 
-```bash
-docker build -t <image-name> .
-```
+5.5 Undo and Redo
+The calculator supports undo and redo operations using an internal history state system.
+These commands allow you to revert or reapply previous calculations without re‑entering values.
 
-## Run Docker Container
+Undo
+Reverts the most recent calculation.
+If there is no previous calculation to undo, the system notifies you.
 
-```bash
-docker run -it --rm <image-name>
-```
+Example:
+Enter command: undo
+Most recent calculation undone.
 
----
+Redo
+Reapplies the most recently undone calculation.
+If there is nothing to redo, the system notifies you.
 
-# 🚀 6. Running the Project
+Example:
+Enter command: redo
+Last undone calculation restored.
 
-- **Without Docker**:
+5.6 Saving Calculation History
+The calculator allows you to save your calculation history to persistent storage.
+This ensures that your past operations remain available even after restarting the program.
 
-```bash
-python main.py
-```
+Example:
+Enter command: save
+History successfully saved.
 
-(or update this if the main script is different.)
+If saving fails, the system will notify you.
 
-- **With Docker**:
+5.7 Loading Calculation History
+You can load previously saved history at any time.
+This restores your past calculations into the current session.
 
-```bash
-docker run -it --rm <image-name>
-```
+Example:
+Enter command: load
+History successfully loaded.
 
----
+If no saved history exists, the system displays:
+No saved history found.
 
-# 📝 7. Submission Instructions
+5.8 Clearing Calculation History
+The clear command removes all stored calculations from the current session.
+This action does not delete saved history on disk unless you overwrite it later.
 
-After finishing your work:
+Example:
+Enter command: clear
+History cleared.
 
-```bash
-git add .
-git commit -m "Complete Module X"
-git push origin main
-```
+5.9 Exiting the Application
+To close the calculator, enter the exit command.
+The program will terminate immediately.
 
-Then submit the GitHub repository link as instructed.
+Example:
+Enter command: exit
+Goodbye.
 
----
+6. Testing and Quality Assurance
+This project includes automated unit tests to ensure correctness, reliability, and maintainability.
+Tests cover:
 
-# 🔥 Useful Commands Cheat Sheet
+Arithmetic operations
+Input validation
+History management
+Undo and redo functionality
+Factory and strategy behavior
+Error handling
 
-| Action                         | Command                                          |
-| ------------------------------- | ------------------------------------------------ |
-| Install Homebrew (Mac)          | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
-| Install Git                     | `brew install git` or Git for Windows installer |
-| Configure Git Global Username  | `git config --global user.name "Your Name"`      |
-| Configure Git Global Email     | `git config --global user.email "you@example.com"` |
-| Clone Repository                | `git clone <repo-url>`                          |
-| Create Virtual Environment     | `python3 -m venv venv`                           |
-| Activate Virtual Environment   | `source venv/bin/activate` / `venv\Scripts\activate.bat` |
-| Install Python Packages        | `pip install -r requirements.txt`               |
-| Build Docker Image              | `docker build -t <image-name> .`                |
-| Run Docker Container            | `docker run -it --rm <image-name>`               |
-| Push Code to GitHub             | `git add . && git commit -m "message" && git push` |
+To run the test suite, use your preferred Python test runner (for example, pytest).
 
----
+7. Project Structure
+The project follows a modular architecture with clear separation of concerns.
+Typical components include:
 
-# 📋 Notes
+Operation classes
+Factory for operation creation
+History manager
+Memento system for undo/redo
+REPL interface
+Utility modules
+Test suite
 
-- Install **Homebrew** first on Mac.
-- Install and configure **Git** and **SSH** before cloning.
-- Use **Python 3.10+** and **virtual environments** for Python projects.
-- **Docker** is optional depending on the project.
+This structure supports scalability, readability, and ease of maintenance.
 
----
-
-# 📎 Quick Links
-
-- [Homebrew](https://brew.sh/)
-- [Git Downloads](https://git-scm.com/downloads)
-- [Python Downloads](https://www.python.org/downloads/)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [GitHub SSH Setup Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+8. Conclusion
+This modular Python calculator demonstrates clean software design, extensibility, and robust state management.
+It serves as a practical example of applying design patterns and testing practices in a real‑world Python application.
