@@ -8,7 +8,8 @@ from decimal import Decimal, InvalidOperation
 import logging
 from typing import Any, Dict
 
-from app.exceptions import OperationError
+from app.exceptions import OperationError, ValidationError
+from app.operations import OperationFactory
 
 
 @dataclass
@@ -42,42 +43,39 @@ class Calculation:
 
     def calculate(self) -> Decimal:
         """
-        Execute calculation using the specified operation.
-
-        Utilizes a dictionary to map operation names to their corresponding
-        lambda functions, enabling dynamic execution of operations based on
-        the operation name.
-
-        Returns:
-            Decimal: The result of the calculation.
-
-        Raises:
-            OperationError: If the operation is unknown or the calculation fails.
+        Execute calculation using the OperationFactory.
         """
-        # Mapping of operation names to their corresponding functions
-        operations = {
-            "Addition": lambda x, y: x + y,
-            "Subtraction": lambda x, y: x - y,
-            "Multiplication": lambda x, y: x * y,
-            "Division": lambda x, y: x / y if y != 0 else self._raise_div_zero(),
-            "Power": lambda x, y: Decimal(pow(float(x), float(y))) if y >= 0 else self._raise_neg_power(),
-            "Root": lambda x, y: (
-                Decimal(pow(float(x), 1 / float(y))) 
-                if x >= 0 and y != 0 
-                else self._raise_invalid_root(x, y)
-            )
+
+        OPERATION_NAME_MAP = {
+            "Addition": "add",
+            "Subtraction": "subtract",
+            "Multiplication": "multiply",
+            "Division": "divide",
+            "Power": "power",
+            "Root": "root",
+            "Modulus": "modulus",
+            "IntegerDivision": "integer_division",
+            "Percentage": "percentage",
+            "AbsoluteDifference": "absolute_difference"
         }
 
-        # Retrieve the operation function based on the operation name
-        op = operations.get(self.operation)
-        if not op:
-            raise OperationError(f"Unknown operation: {self.operation}")
+        # Translate human-readable operation names to factory keys
+        operation_key = OPERATION_NAME_MAP.get(self.operation)
 
+        # Handle invalid or unknown operations gracefully
+        if not operation_key:
+            raise OperationError(f"Invalid operation: {self.operation}")
+
+        # Normalize to lowercase for factory lookup
+        operation_key = operation_key.lower()
+        operation = OperationFactory.create_operation(operation_key)
+
+        # Create and execute the operation
         try:
-            # Execute the operation with the provided operands
-            return op(self.operand1, self.operand2)
-        except (InvalidOperation, ValueError, ArithmeticError) as e:
-            # Handle any errors that occur during calculation
+            return operation.execute(self.operand1, self.operand2)
+        except ValidationError:
+            raise
+        except Exception as e:
             raise OperationError(f"Calculation failed: {str(e)}")
 
     @staticmethod
