@@ -28,9 +28,14 @@ class InputValidator:
             ValidationError: If input is invalid
         """
         try:
+            # If the input is a string, remove extra spaces
             if isinstance(value, str):
                 value = value.strip()
+            # Convert the input into a Decimal
+            # Using str(value) avoids floating-point precision issues
             number = Decimal(str(value))
+            # Enforce maximum allowed input value from configuration
+            # Prevents extremely large numbers from crashing the calculator
             if abs(number) > config.max_input_value:
                 raise ValidationError(f"Value exceeds maximum allowed: {config.max_input_value}")
             return number.normalize()
