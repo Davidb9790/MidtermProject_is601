@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from decimal import Decimal
 from typing import Dict
 from app.exceptions import ValidationError
+from app.exceptions import OperationError
 
 
 class Operation(ABC):
@@ -49,7 +50,7 @@ class Operation(ABC):
         Raises:
             ValidationError: If operands are invalid.
         """
-        pass
+        pass # pragma: no cover
 
     def __str__(self) -> str:
         """
@@ -248,6 +249,69 @@ class Root(Operation):
         self.validate_operands(a, b)
         return Decimal(pow(float(a), 1 / float(b)))
 
+class Modulus(Operation):
+    """
+    Modulus operation implementation.
+
+    Computes the remainder of dividing one number by another.
+    """
+
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        super().validate_operands(a, b)
+        if b == 0:
+            raise ValidationError("Modulus by zero is not allowed")
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        self.validate_operands(a, b)
+        return a % b
+
+class IntegerDivision(Operation):
+    """
+    Integer division operation implementation.
+
+    Performs floor division between two numbers.
+    """
+
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        super().validate_operands(a, b)
+        if b == 0:
+            raise ValidationError("Integer division by zero is not allowed")
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        self.validate_operands(a, b)
+        return a // b
+
+class Percentage(Operation):
+    """
+    Percentage operation implementation.
+
+    Computes (a * b) / 100.
+    Example: 50% of 200 → 100
+    """
+
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        super().validate_operands(a, b)
+        # No special validation needed
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        self.validate_operands(a, b)
+        return (a * b) / Decimal(100)
+
+class AbsoluteDifference(Operation):
+    """
+    Absolute difference operation implementation.
+
+    Computes |a - b|.
+    """
+
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        super().validate_operands(a, b)
+        # No special validation needed
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        self.validate_operands(a, b)
+        return abs(a - b)
+
 
 class OperationFactory:
     """
@@ -265,7 +329,11 @@ class OperationFactory:
         'multiply': Multiplication,
         'divide': Division,
         'power': Power,
-        'root': Root
+        'root': Root,
+        'modulus': Modulus,
+        'integer_division': IntegerDivision,
+        'percentage': Percentage,
+        'absolute_difference': AbsoluteDifference,
     }
 
     @classmethod
@@ -305,5 +373,5 @@ class OperationFactory:
         """
         operation_class = cls._operations.get(operation_type.lower())
         if not operation_class:
-            raise ValueError(f"Unknown operation: {operation_type}")
+            raise OperationError(f"Unknown operation: {operation_type}")
         return operation_class()
