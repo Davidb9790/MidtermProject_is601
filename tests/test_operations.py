@@ -250,3 +250,17 @@ def test_integer_division_valid_operation():
     result = op.execute(Decimal("10"), Decimal("3"))
     assert result == Decimal("3")
 
+# 293 PERCENTAGE
+def test_percentage_validate_operands_runs_super():
+    from app.operations import Percentage
+    op = Percentage()
+    # This should NOT raise any error for valid operands
+    op.validate_operands(Decimal("10"), Decimal("5"))
+
+# 297 - 298 PERCENTAGE
+def test_percentage_execute_valid_operation():
+    from app.operations import Percentage
+    op = Percentage()
+    result = op.execute(Decimal("50"), Decimal("200"))
+    assert result == Decimal("100")
+
