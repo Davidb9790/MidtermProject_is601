@@ -11,6 +11,7 @@ from app.calculator_config import CalculatorConfig
 from app.exceptions import OperationError, ValidationError
 from app.history import LoggingObserver, AutoSaveObserver
 from app.operations import OperationFactory
+from colorama import Fore, Style
 
 # Fixture to initialize Calculator with a temporary directory for file paths
 @pytest.fixture
@@ -164,8 +165,8 @@ def test_calculator_repl_exit(mock_print, mock_input):
     with patch('app.calculator.Calculator.save_history') as mock_save_history:
         calculator_repl()
         mock_save_history.assert_called_once()
-        mock_print.assert_any_call("History saved successfully.")
-        mock_print.assert_any_call("Goodbye!")
+        mock_print.assert_any_call(Fore.CYAN + "History saved successfully." + Style.RESET_ALL)
+        mock_print.assert_any_call(Fore.MAGENTA + "Goodbye!" + Style.RESET_ALL)
 
 @patch('builtins.input', side_effect=['help', 'exit'])
 @patch('builtins.print')
@@ -177,4 +178,4 @@ def test_calculator_repl_help(mock_print, mock_input):
 @patch('builtins.print')
 def test_calculator_repl_addition(mock_print, mock_input):
     calculator_repl()
-    mock_print.assert_any_call("\nResult: 5")
+    mock_print.assert_any_call(Fore.GREEN + "\nResult: 5" + Style.RESET_ALL)
