@@ -2,7 +2,7 @@ import pytest
 from decimal import Decimal
 from typing import Any, Dict, Type
 
-from app.exceptions import ValidationError
+from app.exceptions import ValidationError, OperationError
 from app.operations import (
     Operation,
     Addition,
@@ -12,6 +12,8 @@ from app.operations import (
     Power,
     Root,
     OperationFactory,
+    Modulus,
+    IntegerDivision
 )
 
 
@@ -205,7 +207,7 @@ class TestOperationFactory:
 
     def test_create_invalid_operation(self):
         """Test creation of invalid operation raises error."""
-        with pytest.raises(ValueError, match="Unknown operation: invalid_op"):
+        with pytest.raises(OperationError, match=r"Unknown operation: invalid_op"):
             OperationFactory.create_operation("invalid_op")
 
     def test_register_valid_operation(self):
@@ -225,3 +227,26 @@ class TestOperationFactory:
 
         with pytest.raises(TypeError, match="Operation class must inherit"):
             OperationFactory.register_operation("invalid", InvalidOperation)
+# 259 - 262 MODULUS
+def test_modulus_by_zero_raises_validation_error():
+    op = Modulus()
+    with pytest.raises(ValidationError, match="Modulus by zero is not allowed"):
+        op.validate_operands(Decimal("5"), Decimal("0"))
+# 265 - 266 MODULUS
+def test_modulus_valid_operation():
+    op = Modulus()
+    result = op.execute(Decimal("10"), Decimal("3"))
+    assert result == Decimal("1")
+
+# 277 - 278 IntegerDivision
+def test_integer_division_by_zero_raises_validation_error():
+    op = IntegerDivision()
+    with pytest.raises(ValidationError, match="Integer division by zero is not allowed"):
+        op.validate_operands(Decimal("5"), Decimal("0"))
+
+# 281 - 282 IntegerDivision
+def test_integer_division_valid_operation():
+    op = IntegerDivision()
+    result = op.execute(Decimal("10"), Decimal("3"))
+    assert result == Decimal("3")
+
