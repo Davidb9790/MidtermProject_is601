@@ -264,3 +264,15 @@ def test_percentage_execute_valid_operation():
     result = op.execute(Decimal("50"), Decimal("200"))
     assert result == Decimal("100")
 
+# 308 ABSOLUTE DIFFERENCE
+def test_absolute_difference_validate_operands_runs_super():
+    from app.operations import AbsoluteDifference
+    op = AbsoluteDifference()
+    op.validate_operands(Decimal("10"), Decimal("5"))
+
+# 312 - 313 ABSOLUTE DIFFERENCE
+def test_absolute_difference_execute_valid_operation():
+    from app.operations import AbsoluteDifference
+    op = AbsoluteDifference()
+    result = op.execute(Decimal("10"), Decimal("3"))
+    assert result == Decimal("7")
