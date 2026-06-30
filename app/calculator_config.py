@@ -67,33 +67,38 @@ class CalculatorConfig:
             default_encoding (Optional[str], optional): Default encoding for file operations. Defaults to None.
         """
         # Set base directory to project root by default
+        # If not provided, use project root or CALCULATOR_BASE_DIR from .env.
         project_root = get_project_root()
         self.base_dir = base_dir or Path(
             os.getenv('CALCULATOR_BASE_DIR', str(project_root))
         ).resolve()
 
         # Maximum history size
+        # Comes from constructor => .env => default 1000
         self.max_history_size = max_history_size or int(
             os.getenv('CALCULATOR_MAX_HISTORY_SIZE', '1000') # Defaults but gets overriden in the .env file
         )
 
         # Auto-save preference
+        # Accept "true", "1", "false", "0"
         auto_save_env = os.getenv('CALCULATOR_AUTO_SAVE', 'true').lower()
         self.auto_save = auto_save if auto_save is not None else (
             auto_save_env == 'true' or auto_save_env == '1'
         )
 
         # Calculation precision
+        # Number of decimal places to round results to
         self.precision = precision or int(
             os.getenv('CALCULATOR_PRECISION', '10')
         )
 
         # Maximum input value allowed
+        # Prevents extremely large numbers from crashing the calculator.
         self.max_input_value = max_input_value or Decimal(
             os.getenv('CALCULATOR_MAX_INPUT_VALUE', '1e999')
         )
 
-        # Default encoding for file operations
+        # Default encoding for file operations (CSV, logs, etc.)
         self.default_encoding = default_encoding or os.getenv(
             'CALCULATOR_DEFAULT_ENCODING', 'utf-8'
         )
@@ -101,6 +106,9 @@ class CalculatorConfig:
     @property
     def log_dir(self) -> Path:
         """
+        Directory where log files are stored.
+        Defaults to <base_dir>/logs unless underriden in .env
+
         Get log directory path.
 
         Determines the directory path where log files will be stored.
@@ -116,6 +124,8 @@ class CalculatorConfig:
     @property
     def history_dir(self) -> Path:
         """
+        Directory where history CSV files are stored. 
+        Defaults to <base_dir>/history unless overridden.
         Get history directory path.
 
         Determines the directory path where calculation history files will be stored.
@@ -131,6 +141,7 @@ class CalculatorConfig:
     @property
     def history_file(self) -> Path:
         """
+        Path to CSV file that stores calculation history
         Get history file path.
 
         Determines the file path for storing calculation history in CSV format.
@@ -146,6 +157,7 @@ class CalculatorConfig:
     @property
     def log_file(self) -> Path:
         """
+        Path to the log file where LoggingObserver writes entries
         Get log file path.
 
         Determines the file path for storing log entries.
@@ -160,6 +172,7 @@ class CalculatorConfig:
 
     def validate(self) -> None:
         """
+        Validate configuration values to ensure they are safe and logical
         Validate configuration settings.
 
         Ensures that all configuration parameters meet the required criteria.
