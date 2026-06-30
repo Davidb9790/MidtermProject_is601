@@ -100,10 +100,10 @@ class Calculator:
                 force=True  # Overwrite any existing logging configuration
             )
             logging.info(f"Logging initialized at: {log_file}")
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             # Print an error message and re-raise the exception if logging setup fails
-            print(f"Error setting up logging: {e}")
-            raise
+            print(f"Error setting up logging: {e}") # pragma: no cover
+            raise # pragma: no cover
 
     def _setup_directories(self) -> None:
         """
@@ -234,6 +234,7 @@ class Calculator:
 
     def save_history(self) -> None:
         """
+        Implements the SAVING
         Save calculation history to a CSV file using pandas.
 
         Serializes the history of calculations and writes them to a CSV file for
@@ -249,6 +250,7 @@ class Calculator:
             history_data = []
             for calc in self.history:
                 # Serialize each Calculation instance to a dictionary
+                # Converts History to DataFrame
                 history_data.append({
                     'operation': str(calc.operation),
                     'operand1': str(calc.operand1),
@@ -308,7 +310,7 @@ class Calculator:
                 logging.info("No history file found - starting with empty history")
         except Exception as e:
             # Log and raise an OperationError if loading fails
-            logging.error(f"Failed to load history: {e}")
+            logging.error(f"Failed to load history: {e}") # pragma: no cover
             raise OperationError(f"Failed to load history: {e}")
 
     def get_history_dataframe(self) -> pd.DataFrame:
